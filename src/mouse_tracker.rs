@@ -1,11 +1,11 @@
 mod mouse_tracker {
 
     pub enum TrackingResult {
-        InPrevRect,
-        InCurrentRect,
-        InNextRect,
-        FinishedRectShape,
-        OutOfTrack,
+        InPrevRect,         // mouse is now in the previous rect / continue
+        InCurrentRect,      // mouse is now in the current rect  / continue
+        InNextRect,         // mouse is now in the next rect     / continue
+        FinishedRectShape,  // mouse is now in the last rect!    / go to next shape
+        OutOfTrack,         // mouse is now out of given track   / reset all
     }
 
     #[derive(Copy, Clone)]
@@ -125,11 +125,6 @@ mod mouse_tracker {
                     i -= size;
                 }
             }
-            
-            track.push(Rectangular {
-                top_sx: Point { x: 0, y: h },
-                bot_rx: Point { x: size, y: h - size },
-            });
 
             MouseTracker {
                 width: w,
