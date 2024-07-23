@@ -51,9 +51,8 @@ impl MouseTracker {
     pub fn new(w: u32, h: u32) -> Self {
         let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
-        let min_cells = 10;
-        // let size = (u32::min(h, w) + min_cells - 1) / min_cells;
-        let size = 100;
+        let min_cells = 25;
+        let size = (u32::min(h, w) + min_cells - 1) / min_cells;
         let limit = size * 2 / 3;
 
 
