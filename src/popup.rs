@@ -1,3 +1,4 @@
+use std::env;
 use std::sync::Arc;
 use std::sync::mpsc::{Sender};
 use egui::Context;
@@ -64,7 +65,11 @@ pub fn run_popup(sender: Sender<Choice>) {
     native_options.centered = true;
     native_options.viewport.drag_and_drop = Some(false);
 
-    let icon = image::open("./assets/logo.png").expect("Failed to open icon path").to_rgba8();
+    let exe_path = env::current_exe().expect("Failed to get current executable path");
+    let assets_path = exe_path.parent().unwrap().join("assets");
+    let logo_path=assets_path.join("logo.png");
+
+    let icon = image::open(&logo_path).expect("Failed to open icon path").to_rgba8();
     let (icon_width, icon_height) = icon.dimensions();
 
     native_options.viewport.icon = Some(Arc::from(egui::IconData {
@@ -73,6 +78,7 @@ pub fn run_popup(sender: Sender<Choice>) {
         height: icon_height,
     }));
 
+    println!("\x07");
     eframe::run_native(
         "Back-up",
         native_options,

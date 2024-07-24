@@ -1,3 +1,4 @@
+use std::env;
 use egui::{Context};
 use std::future::Future;
 use std::sync::Arc;
@@ -119,7 +120,11 @@ pub fn run_backup_app() {
     native_options.viewport.inner_size = Some(egui::vec2(400.0, 220.0));
 
 
-    let icon = image::open("./assets/logo.png").expect("Failed to open icon path").to_rgba8();
+    let exe_path = env::current_exe().expect("Failed to get current executable path");
+    let assets_path = exe_path.parent().unwrap().join("assets");
+    let logo_path=assets_path.join("logo.png");
+
+    let icon = image::open(&logo_path).expect("Failed to open icon path").to_rgba8();
     let (icon_width, icon_height) = icon.dimensions();
 
     native_options.viewport.icon = Some(Arc::from(egui::IconData {
