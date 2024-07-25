@@ -2,11 +2,20 @@ use std::fs;
 use std::io;
 use std::io::{Error, ErrorKind};
 use std::path::Path;
+use serde_json::ser::CompactFormatter;
+use crate::config::Config;
 
 pub fn do_backup() {
     // prendere il path src e dst dal file che li contiene
+    let mut config = Config::default();
+    config.load();
+
+    let src : &Path = Path::new(config.source.as_str());
+    let dst : &Path = Path::new(config.destination.as_str());
+    /*
     let dst = Path::new("/Users/Alessandro/Desktop/backup_prova");
     let src = Path::new("/Users/Alessandro/Desktop/Laboratori_RUST");
+    */
 
     copy_dir_recursive(src, dst, true);
 }
