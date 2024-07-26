@@ -66,7 +66,7 @@ impl MouseTracker {
                 if h < i + size || h - (i + size) < limit {
                     track.push(Rectangular {
                         top_sx: Point { x: 0, y: i },
-                        bot_rx: Point { x: size-1, y: h-1 },
+                        bot_rx: Point { x: size-1, y: h },
                     });
                     i = h;
                 } else {
@@ -74,7 +74,7 @@ impl MouseTracker {
                         top_sx: Point { x: 0, y: i },
                         bot_rx: Point {
                             x: size-1,
-                            y: u32::min(h-1, i + size-1),
+                            y: u32::min(h, i + size-1),
                         },
                     });
                     i += size;
@@ -87,15 +87,15 @@ impl MouseTracker {
                 if w < i + size || w - (i + size) < limit {
                     track.push(Rectangular {
                         top_sx: Point { x: i, y: h - size },
-                        bot_rx: Point { x: w -1, y: h -1 },
+                        bot_rx: Point { x: w, y: h },
                     });
                     i = w;
                 } else {
                     track.push(Rectangular {
                         top_sx: Point { x: i, y: h - size },
                         bot_rx: Point {
-                            x: u32::min(w-1, i + size-1),
-                            y: h -1
+                            x: u32::min(w, i + size-1),
+                            y: h
                         },
                     });
                     i += size;
@@ -108,7 +108,7 @@ impl MouseTracker {
                 if i < size || i - size < limit {
                     track.push(Rectangular {
                         top_sx: Point { x: w - size, y: 0 },
-                        bot_rx: Point { x: w -1, y: i },
+                        bot_rx: Point { x: w, y: i },
                     });
                     i = 0;
                 } else {
@@ -116,7 +116,7 @@ impl MouseTracker {
                         top_sx: Point {
                             x: w - size,
                             y: if i >= size-1 { i - size +1 } else { 0 } },
-                        bot_rx: Point { x: w -1, y: i },
+                        bot_rx: Point { x: w, y: i },
                     });
                     i -= size;
                 }
