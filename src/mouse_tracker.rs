@@ -11,8 +11,8 @@ pub enum TrackingResult {
 
 #[derive(Copy, Clone, Debug)]
 pub struct Point {
-    pub x: u32,
-    pub y: u32,
+    pub x: i32,
+    pub y: i32,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct Rectangular {
@@ -25,7 +25,7 @@ impl Rectangular {
         Rectangular{ top_sx: tsx, bot_rx: bry }
     }
 
-    pub fn is_in(&self, x: u32, y: u32) -> bool {
+    pub fn is_in(&self, x: i32, y: i32) -> bool {
         let cond_x: bool = x > self.top_sx.x && x < self.bot_rx.x;
         let cond_y: bool = y < self.top_sx.y && y > self.bot_rx.y;
         cond_x && cond_y
@@ -34,8 +34,8 @@ impl Rectangular {
 
 #[derive(Debug)]
 pub struct MouseTracker {
-    width: u32,
-    height: u32,
+    width: i32,
+    height: i32,
     track: Vec<Rectangular>,
     current_index: usize,  // index in track vector
 }
@@ -50,11 +50,11 @@ pub fn point_in_rect(p: &Point, r: &Rectangular) -> bool {
 
 
 impl MouseTracker {
-    pub fn new(w: u32, h: u32) -> Self {
+    pub fn new(w: i32, h: i32) -> Self {
         let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
         let min_cells = 10;
-        let size = (u32::min(h, w) + min_cells - 1) / min_cells;
+        let size = (i32::min(h, w) + min_cells - 1) / min_cells;
         let limit = size * 2 / 3;
 
 
@@ -65,16 +65,16 @@ impl MouseTracker {
             while i < h {
                 if h < i + size || h - (i + size) < limit {
                     track.push(Rectangular {
-                        top_sx: Point { x: 0, y: i },
-                        bot_rx: Point { x: size-1, y: h },
+                        top_sx: Point { x: -10, y: i },
+                        bot_rx: Point { x: size-1, y: h + 10 },
                     });
                     i = h;
                 } else {
                     track.push(Rectangular {
-                        top_sx: Point { x: 0, y: i },
+                        top_sx: Point { x: -10, y: i },
                         bot_rx: Point {
                             x: size-1,
-                            y: u32::min(h, i + size-1),
+                            y: i32::min(h +10, i + size-1),
                         },
                     });
                     i += size;
@@ -87,15 +87,15 @@ impl MouseTracker {
                 if w < i + size || w - (i + size) < limit {
                     track.push(Rectangular {
                         top_sx: Point { x: i, y: h - size },
-                        bot_rx: Point { x: w, y: h },
+                        bot_rx: Point { x: w +10, y: h +10 },
                     });
                     i = w;
                 } else {
                     track.push(Rectangular {
                         top_sx: Point { x: i, y: h - size },
                         bot_rx: Point {
-                            x: u32::min(w, i + size-1),
-                            y: h
+                            x: i32::min(w +10, i + size-1),
+                            y: h +10
                         },
                     });
                     i += size;
@@ -107,16 +107,16 @@ impl MouseTracker {
             while i > 0 {
                 if i < size || i - size < limit {
                     track.push(Rectangular {
-                        top_sx: Point { x: w - size, y: 0 },
-                        bot_rx: Point { x: w, y: i },
+                        top_sx: Point { x: w - size, y: -10 },
+                        bot_rx: Point { x: w +10, y: i },
                     });
                     i = 0;
                 } else {
                     track.push(Rectangular {
                         top_sx: Point {
                             x: w - size,
-                            y: if i >= size-1 { i - size +1 } else { 0 } },
-                        bot_rx: Point { x: w, y: i },
+                            y: if i >= size-1 { i - size +1 } else { -10 } },
+                        bot_rx: Point { x: w +10, y: i },
                     });
                     i -= size;
                 }
@@ -127,15 +127,15 @@ impl MouseTracker {
             while i > 0 {
                 if i < size || i - size < limit {
                     track.push(Rectangular {
-                        top_sx: Point { x: 0, y: 0 },
+                        top_sx: Point { x: -10, y: -10 },
                         bot_rx: Point { x: i, y: size -1 },
                     });
                     i = 0;
                 } else {
                     track.push(Rectangular {
                         top_sx: Point {
-                            x: if i >= size - 1 { i - size + 1 } else { 0 },
-                            y: 0 },
+                            x: if i >= size - 1 { i - size + 1 } else { -10 },
+                            y: -10 },
                         bot_rx: Point { x: i, y: size -1 },
                     });
                     i -= size;
