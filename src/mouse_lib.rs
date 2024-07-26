@@ -1,5 +1,5 @@
 use rdev::{listen, Event, EventType};
-use mouse_tracker::mouse_tracker::{MouseTracker, Point};
+use crate::mouse_tracker::{MouseTracker, Point};
 
 pub fn manage_movement(){
 
