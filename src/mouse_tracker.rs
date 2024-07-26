@@ -1,5 +1,6 @@
-use std::cmp::min;
+use crate::run_popup;
 
+#[derive(Debug)]
 pub enum TrackingResult {
     InPrevRect,         // mouse is now in the previous rect / continue
     InCurrentRect,      // mouse is now in the current rect  / continue
@@ -8,12 +9,12 @@ pub enum TrackingResult {
     OutOfTrack,         // mouse is now out of given track   / reset all
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Point {
     pub x: u32,
     pub y: u32,
 }
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Rectangular {
     pub top_sx: Point,
     pub bot_rx: Point,
@@ -31,6 +32,7 @@ impl Rectangular {
     }
 }
 
+#[derive(Debug)]
 pub struct MouseTracker {
     width: u32,
     height: u32,
@@ -42,8 +44,8 @@ pub struct MouseTracker {
 pub fn point_in_rect(p: &Point, r: &Rectangular) -> bool {
     return p.x >= r.top_sx.x &&
         p.x <= r.bot_rx.x &&
-        p.y <= r.top_sx.y &&
-        p.y >= r.bot_rx.y;
+        p.y >= r.top_sx.y &&
+        p.y <= r.bot_rx.y;
 }
 
 
@@ -51,7 +53,7 @@ impl MouseTracker {
     pub fn new(w: u32, h: u32) -> Self {
         let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
-        let min_cells = 25;
+        let min_cells = 10;
         let size = (u32::min(h, w) + min_cells - 1) / min_cells;
         let limit = size * 2 / 3;
 
@@ -153,6 +155,10 @@ impl MouseTracker {
         let curr_rect: Rectangular = self.track[self.current_index].clone();
 
         // mouse still in current rect
+        if point_in_rect(&p, &curr_rect) && self.current_index == self.track.len() - 1 {
+            return TrackingResult::FinishedRectShape;
+        }
+
         if point_in_rect(&p, &curr_rect) {
             return TrackingResult::InCurrentRect;
 
@@ -163,7 +169,6 @@ impl MouseTracker {
             // mouse in next rect -> update current_index and check for last
         } else if self.current_index + 1 < self.track.len() && point_in_rect(&p, &self.track[self.current_index + 1]) {
             self.current_index += 1;
-
             // in last rect
             if self.current_index + 1 == self.track.len() {
                 return TrackingResult::FinishedRectShape;

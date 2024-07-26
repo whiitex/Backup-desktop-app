@@ -12,4 +12,5 @@ mod mouse_lib;
 
 pub use popup::{Choice, Popup, run_popup};
 
+pub use mouse_lib::*;
 pub use mouse_tracker::*;

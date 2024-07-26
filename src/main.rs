@@ -1,7 +1,8 @@
 use std::process::Command;
-
+use Group13::manage_movement;
 fn main() {
 
+    manage_movement();
     let mut gui=Command::new("cargo")
         .arg("run")
         .arg("--bin")
