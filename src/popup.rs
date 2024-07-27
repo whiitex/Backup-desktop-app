@@ -1,10 +1,12 @@
 use std::env;
+use std::ops::Not;
 use std::sync::Arc;
 use std::sync::mpsc::{Sender};
 use egui::Context;
 
 pub struct Popup {
-    sender: Sender<Choice>
+    sender: Sender<Choice>,
+    verbose: bool,
 }
 
 pub enum Choice{
@@ -13,9 +15,10 @@ pub enum Choice{
 }
 
 impl Popup {
-    pub fn new(sender: Sender<Choice>) -> Self {
+    pub fn new(sender: Sender<Choice>, verbose: bool) -> Self {
         Self {
-            sender
+            sender,
+            verbose,
         }
     }
 }
@@ -31,19 +34,19 @@ impl eframe::App for Popup {
                         if ui.button("Yes").clicked() {
                             match self.sender.send(Choice::Yes) {
                                 Ok(_) => {
-                                    println!("(Popup) User chose to proceed.");
+                                    if self.verbose {println!("(Popup) User chose to proceed.");}
                                     ctx.send_viewport_cmd(egui::ViewportCommand::Close)
                                 }
-                                Err(_) => { eprintln!("(Popup) Error sending choice.") }
+                                Err(_) => { if self.verbose {eprintln!("(Popup) Error sending choice.")} }
                             }
                         }
                         if ui.button("No").clicked() {
                             match self.sender.send(Choice::No) {
                                 Ok(_) => {
-                                    println!("(Popup) User chose not to proceed.");
+                                    if self.verbose {println!("(Popup) User chose not to proceed.")};
                                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                                 }
-                                Err(_) => { eprintln!("(Popup) Error sending choice.") }
+                                Err(_) => { if self.verbose{eprintln!("(Popup) Error sending choice.")} }
                             }
                         }
                     });
@@ -55,7 +58,7 @@ impl eframe::App for Popup {
     }
 }
 
-pub fn run_popup(sender: Sender<Choice>) {
+pub fn run_popup(sender: Sender<Choice>,verbose:bool) {
     let mut native_options = eframe::NativeOptions::default();
     native_options.viewport.drag_and_drop = Some(false);
     native_options.viewport.maximize_button = Some(false);
@@ -78,10 +81,9 @@ pub fn run_popup(sender: Sender<Choice>) {
         height: icon_height,
     }));
 
-    println!("\x07");
     eframe::run_native(
         "Back-up",
         native_options,
-        Box::new(|_cc| Box::new(Popup::new(sender))),
+        Box::new(move |_cc| Box::new(Popup::new(sender,verbose))),
     ).expect("Terminated");
 }

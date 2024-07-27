@@ -8,22 +8,22 @@ fn main() {
             Ok(choice) => {
                 match choice {
                     Choice::Yes => {
-                        println!("User chose to proceed.");
-                        std::process::exit(1);
+                        print!("1");
+                        std::process::exit(0);
                     }
                     Choice::No => {
-                        println!("User chose not to proceed.");
-                        std::process::exit(2);
+                        print!("2");
+                        std::process::exit(0);
                     }
                 }
             }
             Err(_) => {
-                println!("Error: not proceeding.");
-                std::process::exit(3);
+                print!("3");
+                std::process::exit(0);
             }
         }
     });
 
-    run_popup(sender);
+    run_popup(sender,false);
 
 }
