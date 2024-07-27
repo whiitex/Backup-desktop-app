@@ -3,16 +3,18 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Default)]
 pub struct Config {
-    pub(crate) source: String,
-    pub(crate) destination: String,
+    pub source: String,
+    pub destination: String,
+    pub extension: String,
 }
 
 impl Config{
 
-    pub fn new(source: String, destination: String)->Self{
+    pub fn new(source: String, destination: String, extension: String)->Self{
         Self{
             source,
-            destination
+            destination,
+            extension,
         }
     }
     pub fn save(&self) {
@@ -31,6 +33,7 @@ impl Config{
                 if let Ok(config) = serde_json::from_str::<Config>(&content) {
                     self.source = config.source;
                     self.destination = config.destination;
+                    self.extension = config.extension;
                 }
             },
             Err(_e) => {

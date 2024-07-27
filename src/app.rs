@@ -1,15 +1,13 @@
 use std::borrow::Cow;
 use std::env;
 use std::fs::File;
-use egui::{Context, Id, Image, TextureHandle, TextureOptions};
+use egui::{Context, TextureHandle, TextureOptions};
 use std::future::Future;
-use std::io::BufReader;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
 use futures::SinkExt;
-use gif::{Decoder, Frame};
+use gif::{Frame};
 use image::{DynamicImage, RgbaImage};
 use crate::config::Config;
 
@@ -18,6 +16,7 @@ pub struct BackupApp {
     destination_channel: (Sender<String>, Receiver<String>),
     source: String,
     destination: String,
+    extension: String,
     current_frame: usize,
     frames_rect: Vec<Frame<'static>>,
     rect_texture: Option<TextureHandle>,
@@ -35,6 +34,7 @@ impl Default for BackupApp {
             destination_channel: channel(),
             source: String::from("No folder selected"),
             destination: String::from("No folder selected"),
+            extension: "".to_string(),
             current_frame: 0,
             frames_rect: Vec::new(),
             frame_duration: Duration::from_millis(25),
@@ -63,7 +63,7 @@ impl BackupApp {
     }
 
     fn save_config(&self) {
-        let config = Config::new(self.source.clone(), self.destination.clone());
+        let config = Config::new(self.source.clone(), self.destination.clone(), self.extension.clone());
         config.save();
     }
 
@@ -72,6 +72,7 @@ impl BackupApp {
         config.load();
         self.source = config.source;
         self.destination = config.destination;
+        self.extension = config.extension;
     }
 }
 
@@ -184,6 +185,15 @@ impl eframe::App for BackupApp {
 
                 ui.add_space(20.0);
 
+                ui.vertical_centered(|ui| {
+                    ui.label("Extension (keep empty for all files)");
+                    ui.add(egui::TextEdit::singleline(&mut self.extension).desired_width(100.0));
+                    if ui.button("Set").clicked() {
+                        self.save_config();
+                    }
+                });
+                
+                ui.add_space(20.0);
                 if ui.button("Close").clicked() {
                     self.save_config();
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close)
@@ -200,7 +210,7 @@ fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
 pub fn run_backup_app() {
     let mut native_options = eframe::NativeOptions::default();
     native_options.centered = true;
-    native_options.viewport.inner_size = Some(egui::vec2(400.0, 220.0));
+    native_options.viewport.inner_size = Some(egui::vec2(400.0, 300.0));
 
 
     let exe_path = env::current_exe().expect("Failed to get current executable path");

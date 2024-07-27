@@ -5,27 +5,27 @@ use std::path::Path;
 use serde_json::ser::CompactFormatter;
 use crate::config::Config;
 
-pub fn do_backup() {
-    // prendere il path src e dst dal file che li contiene
+pub fn do_backup(){
+
     let mut config = Config::default();
     config.load();
 
     let src : &Path = Path::new(config.source.as_str());
     let dst : &Path = Path::new(config.destination.as_str());
-    /*
-    let dst = Path::new("/Users/Alessandro/Desktop/backup_prova");
-    let src = Path::new("/Users/Alessandro/Desktop/Laboratori_RUST");
-    */
+    let target_ext = config.extension.as_str();
 
-    copy_dir_recursive(src, dst, true);
-}
-fn copy_dir_recursive(src: &Path, dst: &Path, first: bool) -> io::Result<()> {
-
-    if !dst.exists() && first{
-        return io::Result::Err(Error::new(ErrorKind::NotFound, "Path inesistente"));
+    if src.exists() && dst.exists() {
+        match copy_dir_recursive(src, dst,target_ext) {
+            Ok(_) => {}
+            Err(_) => {eprintln!("Error copying files.")}
+        };
     }
+    else { eprintln!("Directory does not exist!") }
 
-    if !dst.exists() {
+}
+fn copy_dir_recursive(src: &Path, dst: &Path, target_ext: &str)-> io::Result<()>{
+
+    if !dst.exists()  {
         fs::create_dir(dst)?;
     }
 
@@ -35,9 +35,13 @@ fn copy_dir_recursive(src: &Path, dst: &Path, first: bool) -> io::Result<()> {
         let dest_path = dst.join(entry.file_name());
 
         if path.is_dir() {
-            copy_dir_recursive(&path, &dest_path, false)?;
+            copy_dir_recursive(&path, &dest_path, target_ext)?;
         } else {
-            fs::copy(&path, &dest_path)?;
+            if let Some(ext) = path.extension() {
+                if target_ext.len() == 0 || ext.to_str().unwrap() == target_ext {
+                    fs::copy(&path, &dest_path)?;
+                }
+            }
         }
     }
 
