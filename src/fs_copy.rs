@@ -1,8 +1,8 @@
+use std::fmt::Debug;
 use std::fs;
 use std::io;
-use std::io::{Error, ErrorKind};
 use std::path::Path;
-use serde_json::ser::CompactFormatter;
+use chrono::Local;
 use crate::config::Config;
 
 pub fn do_backup(){
@@ -15,7 +15,11 @@ pub fn do_backup(){
     let target_ext = config.extension.as_str();
 
     if src.exists() && dst.exists() {
-        match copy_dir_recursive(src, dst,target_ext) {
+        let time = Local::now().format("%Y-%m-%d_%H:%M:%S").to_string();
+        let new_name = format!("{}_{}", src.file_name().unwrap().to_str().unwrap(), time);
+        let dest_new_path = dst.join(new_name);
+        fs::create_dir(dest_new_path.clone()).unwrap();
+        match copy_dir_recursive(src, dest_new_path.as_path(), target_ext) {
             Ok(_) => {}
             Err(_) => {eprintln!("Error copying files.")}
         };
