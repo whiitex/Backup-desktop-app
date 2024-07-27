@@ -115,7 +115,7 @@ pub fn point_in_rect(p: &Point, r: &Rectangular) -> bool {
 fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
     let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
-    let min_cells = 5;
+    let min_cells = 8;
     let size = (i32::min(h, w) + min_cells - 1) / min_cells;
     let limit = size * 2 / 3;
 
@@ -127,16 +127,16 @@ fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
         while i < h {
             if h < i + size || h - (i + size) < limit {
                 track.push(Rectangular {
-                    top_sx: Point { x: -10, y: i },
-                    bot_rx: Point { x: size-1, y: h + 10 },
+                    top_sx: Point { x: -100, y: i },
+                    bot_rx: Point { x: size-1, y: h + 100 },
                 });
                 i = h;
             } else {
                 track.push(Rectangular {
-                    top_sx: Point { x: -10, y: i },
+                    top_sx: Point { x: -100, y: i },
                     bot_rx: Point {
                         x: size-1,
-                        y: i32::min(h +10, i + size-1),
+                        y: i32::min(h +100, i + size-1),
                     },
                 });
                 i += size;
@@ -149,15 +149,15 @@ fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
             if w < i + size || w - (i + size) < limit {
                 track.push(Rectangular {
                     top_sx: Point { x: i, y: h - size },
-                    bot_rx: Point { x: w +10, y: h +10 },
+                    bot_rx: Point { x: w +100, y: h +100 },
                 });
                 i = w;
             } else {
                 track.push(Rectangular {
                     top_sx: Point { x: i, y: h - size },
                     bot_rx: Point {
-                        x: i32::min(w +10, i + size-1),
-                        y: h +10
+                        x: i32::min(w +100, i + size-1),
+                        y: h +100
                     },
                 });
                 i += size;
@@ -169,16 +169,16 @@ fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
         while i > 0 {
             if i < size || i - size < limit {
                 track.push(Rectangular {
-                    top_sx: Point { x: w - size, y: -10 },
-                    bot_rx: Point { x: w +10, y: i },
+                    top_sx: Point { x: w - size, y: -100 },
+                    bot_rx: Point { x: w +100, y: i },
                 });
                 i = 0;
             } else {
                 track.push(Rectangular {
                     top_sx: Point {
                         x: w - size,
-                        y: if i >= size-1 { i - size +1 } else { -10 } },
-                    bot_rx: Point { x: w +10, y: i },
+                        y: if i >= size-1 { i - size +1 } else { -100 } },
+                    bot_rx: Point { x: w +100, y: i },
                 });
                 i -= size;
             }
@@ -189,15 +189,15 @@ fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
         while i > 0 {
             if i < size || i - size < limit {
                 track.push(Rectangular {
-                    top_sx: Point { x: -10, y: -10 },
+                    top_sx: Point { x: -100, y: -100 },
                     bot_rx: Point { x: i, y: size -1 },
                 });
                 i = 0;
             } else {
                 track.push(Rectangular {
                     top_sx: Point {
-                        x: if i >= size - 1 { i - size + 1 } else { -10 },
-                        y: -10 },
+                        x: if i >= size - 1 { i - size + 1 } else { -100 },
+                        y: -100 },
                     bot_rx: Point { x: i, y: size -1 },
                 });
                 i -= size;
@@ -211,14 +211,14 @@ fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
 fn init_minus(w: i32, h: i32) -> Vec<Rectangular> {
     let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
-    let min_cells = 10;
+    let min_cells = 8;
     let size = (i32::min(h, w) + min_cells - 1) / min_cells;
     let limit = size * 2 / 3;
 
     // first rect
     track.push(Rectangular {
-        top_sx: Point { x: -10, y: -10 },
-        bot_rx: Point { x: size -1, y: h +10 },
+        top_sx: Point { x: -100, y: -100 },
+        bot_rx: Point { x: size -1, y: h +100 },
     });
 
     // horizontal, bottom line
@@ -226,16 +226,16 @@ fn init_minus(w: i32, h: i32) -> Vec<Rectangular> {
     while i < w {
         if w < i + size || w - (i + size) < limit {
             track.push(Rectangular {
-                top_sx: Point { x: i, y: -10 },
-                bot_rx: Point { x: w +10, y: h +10 },
+                top_sx: Point { x: i, y: -100 },
+                bot_rx: Point { x: w +100, y: h +100 },
             });
             i = w;
         } else {
             track.push(Rectangular {
-                top_sx: Point { x: i, y: -10 },
+                top_sx: Point { x: i, y: -100 },
                 bot_rx: Point {
-                    x: i32::min(w +10, i + size-1),
-                    y: h +10
+                    x: i32::min(w +100, i + size-1),
+                    y: h +100
                 },
             });
             i += size;

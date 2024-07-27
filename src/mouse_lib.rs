@@ -99,7 +99,7 @@ pub fn manage_movement() {
                             println!("\x07");
 
                             println!("Backup started");
-                            //do_backup();
+                            do_backup();
                             println!("Backup done");
 
                             #[cfg(target_os = "windows")]
@@ -115,7 +115,7 @@ pub fn manage_movement() {
                             #[cfg(not(target_os = "windows"))]
                             {
                                 Command::new("kill")
-                                    .args(&["-9", &pid.to_string()])
+                                    .args(&["-9", &pid.unwrap().to_string()])
                                     .output().unwrap();
                             }
                         },
