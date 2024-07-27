@@ -21,19 +21,18 @@ pub fn manage_movement() {
     };
 
     // Crea un `MouseTracker` inizializzato con la dimensione dello schermo
-    let tracker = Arc::new(Mutex::new((MouseTracker::new(size.0 as u32, size.1 as u32), 0, 0, Shape::Rect)));
+    let tracker = Arc::new(Mutex::new((MouseTracker::new(size.0 as i32, size.1 as i32), 0, 0, Shape::Rect)));
 
     // Clona l'`Arc` per poterlo usare all'interno della closure
     let tracker_clone = Arc::clone(&tracker);
-    let tracker_clone1 = Arc::clone(&tracker);
 
     // Funzione di callback per gestire gli eventi
     let callback = move |event: Event| {
         match event.event_type {
             EventType::MouseMove { x, y } => {
                 let point = Point {
-                    x: x.trunc() as u32,
-                    y: y.trunc() as u32,
+                    x: x.trunc() as i32,
+                    y: y.trunc() as i32,
                 };
 
                 // Usa `tracker_clone` all'interno della closure
@@ -45,7 +44,7 @@ pub fn manage_movement() {
                     tracker.2 = point.y;
                     println!("{:?}, {:?}", res, point);
                     //println!("{:?}", tracker.0);
-                    /*match res {
+                    match res {
                         TrackingResult::FinishedRectShape => {
 
                             tracker.3 = Shape::Minus;
@@ -54,14 +53,17 @@ pub fn manage_movement() {
 
                             run_popup(sender);
                             drop(tracker);
+
+                            let tracker_clone1 = Arc::clone(&tracker_clone);
+
                             thread::spawn(move ||{
-                                let tracker = tracker_clone1.lock().unwrap();
+                                let mut tracker = tracker_clone1.lock().unwrap();
 
                                 match receiver.recv() {
                                     Ok(v) => {
                                         match v {
                                             Choice::Yes => {
-                                                do_backup();
+                                                //do_backup();
                                                 tracker.3 = Shape::Rect;
                                             }
                                             Choice::No => {
@@ -74,7 +76,7 @@ pub fn manage_movement() {
                             });
                         },
                         _ => {}
-                    }*/
+                    }
                 }
             },
             _ => {}
