@@ -5,7 +5,7 @@ fn main() {
     let mut gui=Command::new("cargo")
         .arg("run")
         .arg("--bin")
-        .arg("gui_example")
+        .arg("spawn_gui")
         .spawn()
         .expect("Failed to execute process");
 

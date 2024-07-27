@@ -80,12 +80,12 @@ impl MouseTracker {
                 // not the last rect
             } else {
 
-                if self.id == 0 { /// RECT
+                if self.id == 0 { // RECT
                     self.id = 1;
                     self.current_index = 0;
                     self.track = init_minus(self.width, self.height);
                     return TrackingResult::FinishedRectShape;
-                } else {          /// MINUS
+                } else {          // MINUS
                     self.id = 0;
                     self.current_index = 0;
                     self.track = init_rect(self.width, self.height);
@@ -115,7 +115,7 @@ pub fn point_in_rect(p: &Point, r: &Rectangular) -> bool {
 fn init_rect(w: i32, h: i32) -> Vec<Rectangular> {
     let mut track: Vec<Rectangular> = Vec::<Rectangular>::new();
 
-    let min_cells = 10;
+    let min_cells = 5;
     let size = (i32::min(h, w) + min_cells - 1) / min_cells;
     let limit = size * 2 / 3;
 

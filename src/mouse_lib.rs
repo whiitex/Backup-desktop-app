@@ -1,3 +1,4 @@
+use std::process::Command;
 use rdev::{listen, Event, EventType};
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc::RecvError;
@@ -42,36 +43,36 @@ pub fn manage_movement() {
                     let res = tracker.0.track_point(point);
                     tracker.1 = point.x;
                     tracker.2 = point.y;
-                    println!("{:?}, {:?}", res, point);
+                    //println!("{:?}, {:?}", res, point);
                     //println!("{:?}", tracker.0);
                     match res {
                         TrackingResult::FinishedRectShape => {
 
                             tracker.3 = Shape::Minus;
 
-                            let (sender, receiver) = std::sync::mpsc::channel();
 
-                            run_popup(sender);
+                            let child =Command::new("cargo")
+                                .arg("run")
+                                .arg("--bin")
+                                .arg("spawn_popup")
+                                .spawn()
+                                .expect("Failed to execute process");
+
                             drop(tracker);
 
                             let tracker_clone1 = Arc::clone(&tracker_clone);
 
                             thread::spawn(move ||{
-                                let mut tracker = tracker_clone1.lock().unwrap();
 
-                                match receiver.recv() {
-                                    Ok(v) => {
-                                        match v {
-                                            Choice::Yes => {
-                                                //do_backup();
-                                                tracker.3 = Shape::Rect;
-                                            }
-                                            Choice::No => {
-                                                tracker.3 = Shape::Rect;
-                                            }
-                                        }
-                                    }
-                                    Err(_) => {tracker.3 = Shape::Rect;}
+                                match child.wait_with_output().unwrap().status.code().unwrap() {
+                                    1 => {
+                                        println!("Backup started");
+                                        //do_backup();
+                                        println!("Backup done");
+                                    },
+                                    _ => {
+                                        println!("Backup not started");
+                                    },
                                 }
                             });
                         },
