@@ -1,6 +1,3 @@
-use tracing_subscriber::fmt::layer;
-use crate::run_popup;
-
 #[derive(Debug)]
 pub enum TrackingResult {
     InPrevRect,         // mouse is now in the previous rect / continue

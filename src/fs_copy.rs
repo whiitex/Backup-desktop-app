@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::fs;
 use std::io;
 use std::io::{ErrorKind};
