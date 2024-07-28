@@ -53,10 +53,7 @@ pub fn manage_movement() {
 
 
 
-                            let child =Command::new("cargo")
-                                .arg("run")
-                                .arg("--bin")
-                                .arg("spawn_popup")
+                            let child =Command::new("spawn_popup")
                                 .stdout(std::process::Stdio::piped())
                                 .spawn()
                                 .expect("Failed to execute process");
@@ -84,8 +81,14 @@ pub fn manage_movement() {
                                     match code {
                                         1 => {
                                             println!("Backup started");
-                                            //do_backup();
-                                            println!("Backup done");
+                                            match do_backup(){
+                                                Ok(_) => {
+                                                    println!("Backup done");
+                                                },
+                                                Err(e) => {
+                                                    println!("Backup failed: {:?}", e);
+                                                }
+                                            }
                                         },
                                         _ => {
                                             println!("Backup not started");
@@ -99,7 +102,14 @@ pub fn manage_movement() {
                             println!("\x07");
 
                             println!("Backup started");
-                            do_backup();
+                            match do_backup() {
+                                Ok(_) => {
+                                    println!("Backup done");
+                                },
+                                Err(e) => {
+                                    println!("Backup failed: {:?}", e);
+                                }
+                            }
                             println!("Backup done");
 
                             #[cfg(target_os = "windows")]

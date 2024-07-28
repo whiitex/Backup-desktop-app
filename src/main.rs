@@ -2,10 +2,7 @@ use std::process::Command;
 use Group13::manage_movement;
 fn main() {
 
-    let mut gui=Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("spawn_gui")
+    let mut gui=Command::new("spawn_gui")
         .spawn()
         .expect("Failed to execute process");
 

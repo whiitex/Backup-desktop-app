@@ -1,11 +1,12 @@
 use std::fmt::Debug;
 use std::fs;
 use std::io;
+use std::io::{ErrorKind};
 use std::path::Path;
 use chrono::Local;
 use crate::config::Config;
 
-pub fn do_backup(){
+pub fn do_backup()-> io::Result<()>{
 
     let mut config = Config::default();
     config.load();
@@ -15,16 +16,15 @@ pub fn do_backup(){
     let target_ext = config.extension.as_str();
 
     if src.exists() && dst.exists() {
-        let time = Local::now().format("%Y-%m-%d_%H:%M:%S").to_string();
+        let time = Local::now().format("%Y-%m-%d-%H-%M-%S").to_string();
         let new_name = format!("{}_{}", src.file_name().unwrap().to_str().unwrap(), time);
         let dest_new_path = dst.join(new_name);
-        fs::create_dir(dest_new_path.clone()).unwrap();
-        match copy_dir_recursive(src, dest_new_path.as_path(), target_ext) {
-            Ok(_) => {}
-            Err(_) => {eprintln!("Error copying files.")}
-        };
+        println!("Copying from {:?} to {:?}", src, dest_new_path);
+        fs::create_dir(dest_new_path.clone()) ?;
+        copy_dir_recursive(src, dest_new_path.as_path(), target_ext)?;
     }
-    else { eprintln!("Directory does not exist!") }
+    else { return Err(io::Error::new(ErrorKind::NotFound, "Source or destination path not found")); }
+    Ok(())
 
 }
 fn copy_dir_recursive(src: &Path, dst: &Path, target_ext: &str)-> io::Result<()>{
