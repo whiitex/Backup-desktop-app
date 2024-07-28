@@ -3,14 +3,14 @@ extern crate core;
 mod app;
 mod config;
 mod mouse_tracker;
-
-pub use app::{BackupApp, run_backup_app};
-
 mod popup;
 mod fs_copy;
-mod mouse_lib;
+mod events;
+mod open_gui;
 
-pub use popup::{Choice, Popup, run_popup};
-
-pub use mouse_lib::*;
+pub use app::*;
+pub use popup::*;
+pub use events::*;
 pub use mouse_tracker::*;
+pub use fs_copy::*;
+pub use open_gui::*;

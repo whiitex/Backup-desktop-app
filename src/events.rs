@@ -1,20 +1,12 @@
-use std::io::{BufRead, Read};
 use std::process::Command;
-use rdev::{listen, Event, EventType};
+use rdev::{listen, Event, EventType, Key};
 use std::sync::{Arc, Mutex};
-use std::sync::mpsc::RecvError;
 use crate::mouse_tracker::{MouseTracker, Point};
-use crate::{Choice, TrackingResult};
+use crate::{TrackingResult};
 use std::thread;
-use std::io::BufReader;
 use crate::fs_copy::do_backup;
-use crate::run_popup;
 
-pub enum Shape {
-    Rect,
-    Minus
-}
-pub fn manage_movement() {
+pub fn manage_events() {
     let size = match rdev::display_size() {
         Ok(s) => {s},
         Err(e) => {
@@ -22,6 +14,9 @@ pub fn manage_movement() {
             return;
         }
     };
+
+    // Stato utilizzato per gestire il tasto shift
+    let state = Arc::new(Mutex::new(0));
 
     // Crea un `MouseTracker` inizializzato con la dimensione dello schermo
     let tracker = Arc::new(Mutex::new((MouseTracker::new(size.0 as i32, size.1 as i32), 0, 0, None)));
@@ -47,7 +42,7 @@ pub fn manage_movement() {
                     tracker.2 = point.y;
                     println!("{:?}, {:?}", res, point);
                     //println!("{:?}", tracker.0);
-                    let mut pid = tracker.3;
+                    let pid = tracker.3;
                     match res {
                         TrackingResult::FinishedRectShape => {
 
@@ -131,6 +126,31 @@ pub fn manage_movement() {
 
                         _ => {}
                     }
+                }
+            },
+            EventType::KeyPress(key) => {
+                let mut state = state.lock().unwrap();
+                if key == Key::ShiftLeft || key == Key::ShiftRight {
+                    *state = 1;
+                }
+                else if key == Key::KeyA && *state == 1 {
+                    println!("Shift+A pressed");
+                    Command::new("spawn_gui")
+                        .spawn()
+                        .expect("Failed to execute process");
+                    *state = 0;
+                }
+                else {
+                    *state = 0;
+                }
+            },
+            EventType::KeyRelease(key) => {
+                match key {
+                    Key::ShiftLeft | Key::ShiftRight => {
+                        let mut state = state.lock().unwrap();
+                        *state = 0;
+                    },
+                    _ => {}
                 }
             },
             _ => {}

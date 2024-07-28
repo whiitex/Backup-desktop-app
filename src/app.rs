@@ -6,7 +6,6 @@ use std::future::Future;
 use std::sync::Arc;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
-use futures::SinkExt;
 use gif::{Frame};
 use image::{DynamicImage, RgbaImage};
 use crate::config::Config;
@@ -17,6 +16,7 @@ pub struct BackupApp {
     source: String,
     destination: String,
     extension: String,
+    prev_extension: String,
     current_frame: usize,
     frames_rect: Vec<Frame<'static>>,
     rect_texture: Option<TextureHandle>,
@@ -24,7 +24,7 @@ pub struct BackupApp {
     line_texture: Option<TextureHandle>,
     frame_duration: Duration,
     start_time: std::time::Instant,
-
+    is_focused: bool
 }
 
 impl Default for BackupApp {
@@ -35,6 +35,7 @@ impl Default for BackupApp {
             source: String::from("No folder selected"),
             destination: String::from("No folder selected"),
             extension: "".to_string(),
+            prev_extension: "".to_string(),
             current_frame: 0,
             frames_rect: Vec::new(),
             frame_duration: Duration::from_millis(25),
@@ -42,6 +43,7 @@ impl Default for BackupApp {
             rect_texture: None,
             frames_line: Vec::new(),
             line_texture: None,
+            is_focused: false
         };
 
         app.load_config();
@@ -79,6 +81,17 @@ impl BackupApp {
 impl eframe::App for BackupApp {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
 
+        ctx.input(|i|{
+            if i.focused {
+                if !self.is_focused {
+                    self.is_focused = true;
+                    self.load_config();
+                }
+            }
+            else { self.is_focused = false;}
+        });
+        if self.is_focused {ctx.request_repaint();}
+
         if let Ok(source) = self.source_channel.1.try_recv() {
             self.source = source;
             self.save_config();
@@ -86,6 +99,11 @@ impl eframe::App for BackupApp {
 
         if let Ok(destination) = self.destination_channel.1.try_recv() {
             self.destination = destination;
+            self.save_config();
+        }
+
+        if self.extension != self.prev_extension {
+            self.prev_extension = self.extension.clone();
             self.save_config();
         }
 
@@ -186,11 +204,16 @@ impl eframe::App for BackupApp {
                 ui.add_space(20.0);
 
                 ui.vertical_centered(|ui| {
-                    ui.label("Extension (keep empty for all files)");
-                    ui.add(egui::TextEdit::singleline(&mut self.extension).desired_width(100.0));
-                    if ui.button("Set").clicked() {
-                        self.save_config();
-                    }
+                    ui.label(format!(
+                        "Selected extension: {}",
+                        if self.extension.is_empty() {
+                            "Any".to_string()
+                        } else {
+                            format!(".{}", self.extension.clone())
+                        }
+                    ));
+                    ui.add(egui::TextEdit::singleline(&mut self.extension).hint_text("Enter extension").desired_width(100.0));
+
                 });
                 
                 ui.add_space(20.0);
@@ -198,6 +221,8 @@ impl eframe::App for BackupApp {
                     self.save_config();
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close)
                 }
+                ui.add_space(5.0);
+                ui.label("Shift+A to open this window again.");
             });
         });
     }
@@ -210,7 +235,7 @@ fn execute<F: Future<Output = ()> + Send + 'static>(f: F) {
 pub fn run_backup_app() {
     let mut native_options = eframe::NativeOptions::default();
     native_options.centered = true;
-    native_options.viewport.inner_size = Some(egui::vec2(400.0, 300.0));
+    native_options.viewport.inner_size = Some(egui::vec2(400.0, 310.0));
 
 
     let exe_path = env::current_exe().expect("Failed to get current executable path");
