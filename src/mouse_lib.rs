@@ -110,7 +110,6 @@ pub fn manage_movement() {
                                     println!("Backup failed: {:?}", e);
                                 }
                             }
-                            println!("Backup done");
 
                             #[cfg(target_os = "windows")]
                             {
