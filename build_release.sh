@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -rf "release/linux"
+
 # Build the project with cargo in release mode for the entire workspace
 cargo build --release --workspace
 

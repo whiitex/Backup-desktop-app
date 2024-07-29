@@ -55,8 +55,6 @@ fn main() {
         let pid = Command::new("pgrep")
             .args(&["-f", &gui_path.to_str().unwrap()])
             .output();
-
-        // println!("{:?}", pid);
         match &pid {
             Ok(_) => {
                 if !pid.unwrap().stdout.is_empty() {
@@ -88,7 +86,7 @@ fn main() {
         }
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "linux")]
     {
         let processes = Command::new("ps")
             .arg("-e")
@@ -105,13 +103,36 @@ fn main() {
         let output = pid.wait_with_output().unwrap();
         let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 2;
 
-        // println!("{:?}", already_active_proc);
+        println!("{:?}", already_active_proc);
         if already_active_proc > 0 {
             println!("Process already running!");
             return;
         }
     }
 
+    #[cfg(target_os = "macos")]
+    {
+        let processes = Command::new("ps")
+            .arg("-e")
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Failed to execute command 'ps'");
+        let pid = Command::new("grep")
+            .arg("Group13")
+            .stdin(Stdio::from(processes.stdout.unwrap()))
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Failed to execute command 'grep'");
+
+        let output = pid.wait_with_output().unwrap();
+        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 4;
+
+        println!("{:?}", already_active_proc);
+        if already_active_proc > 0 {
+            println!("Process already running!");
+            return;
+        }
+    }
 
     /* Events startup */
     manage_events();

@@ -1,4 +1,7 @@
 @echo off
+
+rmdir release\windows
+
 REM Build the project with cargo in release mode for the entire workspace
 cargo build --release --workspace
 
