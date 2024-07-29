@@ -28,4 +28,9 @@ if [ -f "target/release/spawn_popup" ]; then
     cp target/release/spawn_popup release/macos/spawn_popup
 fi
 
+if [ -f "target/release/launcher_backup" ]; then
+    cp target/release/launcher_backup release/macos/launcher_backup
+fi
+
+
 echo "Build and copy process completed successfully."
