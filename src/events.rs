@@ -48,11 +48,9 @@ pub fn manage_events() {
                         TrackingResult::FinishedRectShape => {
 
 
-                            // let out_dir = std::env::var("OUT_DIR").unwrap();
                             let exe = env::current_exe().unwrap();
-                            let len = exe.clone().to_str().unwrap().len();
-                            let wd: String = exe.to_str().unwrap().chars().take(len-7).collect::<Vec<char>>().into_iter().collect();
-                            let popup_path = Path::new(&wd).join("spawn_popup");
+                            let wd = exe.parent().unwrap();
+                            let popup_path = wd.join("spawn_popup");
 
                             let child = Command::new(popup_path.to_str().unwrap())
                                 .stdout(std::process::Stdio::piped())
@@ -139,7 +137,7 @@ pub fn manage_events() {
                     *state = 1;
                 }
                 else if key == Key::KeyT && *state == 1 {
-                    println!("Shift+A pressed");
+                    println!("Ctrl+T pressed");
                     let exe = env::current_exe().unwrap(); // exe path
                     let wd = exe.parent().unwrap();
                     let gui_path = wd.join("spawn_gui");

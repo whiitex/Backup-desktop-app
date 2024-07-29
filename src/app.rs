@@ -222,7 +222,7 @@ impl eframe::App for BackupApp {
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close)
                 }
                 ui.add_space(5.0);
-                ui.label("Shift+A to open this window again.");
+                ui.label("Ctrl+T to open this window again.");
             });
         });
     }

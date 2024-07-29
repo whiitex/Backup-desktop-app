@@ -1,6 +1,5 @@
 use std::process::Command;
 use Group13::manage_events;
-use std::path::Path;
 use auto_launch::AutoLaunchBuilder;
 use std::env;
 
