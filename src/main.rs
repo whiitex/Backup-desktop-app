@@ -6,12 +6,11 @@ use std::env;
 
 fn main() {
     let exe = env::current_exe().unwrap(); // exe path
-    let len = exe.clone().to_str().unwrap().len();
-    let wd: String = exe.to_str().unwrap().chars().take(len-7).collect::<Vec<char>>().into_iter().collect();
+    let wd = exe.parent().unwrap();
     // println!("{}", wd);
 
     /* Autostart configuration */
-    let app_path = Path::new(&wd).join("Group13");
+    let app_path = wd.join("Group13");
     // println!("{}", app_path.to_str().unwrap());
 
     let auto = AutoLaunchBuilder::new()
@@ -26,7 +25,7 @@ fn main() {
 
 
     /* App startup */
-    let gui_path = Path::new(&wd).join("spawn_gui");
+    let gui_path = wd.join("spawn_gui");
     // println!("{}", gui_path.to_str().unwrap());
 
     let mut gui = Command::new(gui_path)

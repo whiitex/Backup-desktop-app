@@ -135,15 +135,58 @@ pub fn manage_events() {
             },
             EventType::KeyPress(key) => {
                 let mut state = state.lock().unwrap();
-                if key == Key::ShiftLeft || key == Key::ShiftRight {
+                if key == Key::ControlLeft || key == Key::ControlRight {
                     *state = 1;
                 }
-                else if key == Key::KeyA && *state == 1 {
+                else if key == Key::KeyT && *state == 1 {
                     println!("Shift+A pressed");
-                    Command::new("spawn_gui")
-                        .spawn()
-                        .expect("Failed to execute process");
-                    *state = 0;
+                    let exe = env::current_exe().unwrap(); // exe path
+                    let wd = exe.parent().unwrap();
+                    let gui_path = wd.join("spawn_gui");
+
+                    #[cfg(target_os = "windows")]
+                    {
+                        let output = Command::new("tasklist")
+                            .arg("/FI")
+                            .arg(format!("IMAGENAME eq {}", gui_path))
+                            .output()
+                            .expect("Failed to execute command");
+
+                        let exists = String::from_utf8_lossy(&output.stdout).contains(executable_name);
+
+                        if exists {
+                            println!("Spawn_gui already running!");
+                        } else {
+                            Command::new(gui_path)
+                                .spawn()
+                                .expect("Failed to execute process");
+                            *state = 0;
+                        }
+                    }
+
+                    #[cfg(not(target_os = "windows"))]
+                    {
+                        let pid = Command::new("pgrep")
+                            .args(&["-f", &gui_path.to_str().unwrap()])
+                            .output();
+
+                        println!("{:?}", pid);
+                        match &pid {
+                            Ok(_) => {
+                                if !pid.unwrap().stdout.is_empty() {
+                                    println!("Spawn_gui already running!");
+                                } else {
+                                    Command::new(gui_path)
+                                        .spawn()
+                                        .expect("Failed to execute process");
+                                    *state = 0;
+                                }
+                            }
+                            Err(_) => {}
+                        }
+                    }
+
+
                 }
                 else {
                     *state = 0;
