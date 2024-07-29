@@ -147,12 +147,11 @@ pub fn manage_events() {
                     #[cfg(target_os = "windows")]
                     {
                         let output = Command::new("tasklist")
-                            .arg("/FI")
-                            .arg(format!("IMAGENAME eq {}", gui_path))
+                            .args(&["/FI", "IMAGENAME eq spawn_gui.exe", "/FO", "CSV", "/NH"])
                             .output()
                             .expect("Failed to execute command");
 
-                        let exists = String::from_utf8_lossy(&output.stdout).contains(executable_name);
+                        let exists = String::from_utf8_lossy(&output.stdout).split(",").count() > 1;
 
                         if exists {
                             println!("Spawn_gui already running!");
