@@ -1,6 +1,6 @@
 use std::process::Command;
 use rdev::{listen, Event, EventType, Key};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Condvar, Mutex};
 use crate::mouse_tracker::{MouseTracker, Point};
 use crate::{TrackingResult};
 use std::{env, thread};
@@ -64,7 +64,9 @@ pub fn manage_events() {
 
                             tracker.3=Some(child.id());
 
-                            play_sound("backup_draw.mp3");
+                            let draw=thread::spawn(move || {
+                                play_sound("backup_draw.mp3");
+                            });
 
                             drop(tracker);
 
@@ -80,16 +82,21 @@ pub fn manage_events() {
                                     match code {
                                         1 => {
                                             println!("Backup started");
-                                            play_sound("backup_started.mp3");
+                                            let started=thread::spawn(move || {
+                                                draw.join().unwrap();
+                                                play_sound("backup_started.mp3");
+                                            });
 
                                             thread::spawn(move || {
                                                 match do_backup(){
                                                     Ok(_) => {
                                                         println!("Backup done");
+                                                        started.join().unwrap();
                                                         play_sound("backup_done.mp3");
                                                     },
                                                     Err(e) => {
                                                         println!("Backup failed: {:?}", e);
+                                                        started.join().unwrap();
                                                         play_sound("backup_failed.mp3");
                                                     }
                                                 }
@@ -104,37 +111,44 @@ pub fn manage_events() {
                             });
                         },
                         TrackingResult::FinishedMinusShape => {
-                            println!("Backup started");
-                            play_sound("backup_started.mp3");
 
                             thread::spawn(move || {
+                                #[cfg(target_os = "windows")]
+                                {
+                                    if let Some(pid) = pid {
+                                        Command::new("taskkill")
+                                            .args(&["/PID", &pid.to_string(), "/F"])
+                                            .output().unwrap();
+                                    }
+                                }
+
+                                #[cfg(not(target_os = "windows"))]
+                                {
+                                    Command::new("kill")
+                                        .args(&["-9", &pid.unwrap().to_string()])
+                                        .output().unwrap();
+                                }
+
+                                println!("Backup started");
+                                let started=thread::spawn(move || {
+                                    play_sound("backup_started.mp3");
+                                });
+
                                 match do_backup(){
                                     Ok(_) => {
                                         println!("Backup done");
+                                        started.join().unwrap();
                                         play_sound("backup_done.mp3");
                                     },
                                     Err(e) => {
                                         println!("Backup failed: {:?}", e);
+                                        started.join().unwrap();
                                         play_sound("backup_failed.mp3");
                                     }
                                 }
                             });
 
-                            #[cfg(target_os = "windows")]
-                            {
-                                if let Some(pid) = pid {
-                                    Command::new("taskkill")
-                                        .args(&["/PID", &pid.to_string(), "/F"])
-                                        .output().unwrap();
-                                }
-                            }
 
-                            #[cfg(not(target_os = "windows"))]
-                            {
-                                Command::new("kill")
-                                    .args(&["-9", &pid.unwrap().to_string()])
-                                    .output().unwrap();
-                            }
                         },
 
                         _ => {}
