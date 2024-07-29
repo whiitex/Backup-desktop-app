@@ -17,5 +17,6 @@ cp -r target/release/assets release/linux/assets
 cp target/release/Group13 release/linux/Group13
 cp target/release/spawn_gui release/linux/spawn_gui
 cp target/release/spawn_popup release/linux/spawn_popup
+cp target/release/uninstall release/linux/uninstall
 
 echo "Build and copy process completed successfully."

@@ -15,5 +15,6 @@ REM Copy the executables to the release/windows directory
 copy /Y target\release\Group13.exe release\windows\Group13.exe
 copy /Y target\release\spawn_gui.exe release\windows\spawn_gui.exe
 copy /Y target\release\spawn_popup.exe release\windows\spawn_popup.exe
+copy /Y target\release\uninstall.exe release\windows\uninstall.exe
 
 echo Build and copy process completed successfully.
