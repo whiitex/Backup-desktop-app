@@ -20,6 +20,14 @@ fn main() {
             .args(&["/IM", "Group13.exe", "/F"])
             .output()
             .expect("Failed to execute command");
+        let _ = Command::new("taskkill")
+            .args(&["/IM", "spawn_gui.exe", "/F"])
+            .output()
+            .expect("Failed to execute command");
+        let _ = Command::new("taskkill")
+            .args(&["/IM", "spawn_popup.exe", "/F"])
+            .output()
+            .expect("Failed to execute command");
     }
     #[cfg(target_os = "macos")]
     {
@@ -27,11 +35,27 @@ fn main() {
             .args(&["-f", "Group13"])
             .output()
             .expect("Failed to execute command");
+        let _ = Command::new("pkill")
+            .args(&["-f", "spawn_gui"])
+            .output()
+            .expect("Failed to execute command");
+        let _ = Command::new("pkill")
+            .args(&["-f", "spawn_popup"])
+            .output()
+            .expect("Failed to execute command");
     }
     #[cfg(target_os = "linux")]
     {
         let _ = Command::new("pkill")
             .args(&["-f", "Group13"])
+            .output()
+            .expect("Failed to execute command");
+        let _ = Command::new("pkill")
+            .args(&["-f", "spawn_gui"])
+            .output()
+            .expect("Failed to execute command");
+        let _ = Command::new("pkill")
+            .args(&["-f", "spawn_popup"])
             .output()
             .expect("Failed to execute command");
     }

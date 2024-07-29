@@ -12,13 +12,8 @@ fn main() {
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
-        .output()
-        .expect("Failed to run Group13");
-
-    Command::new("killall")
-        .arg("Terminal")
         .spawn()
-        .expect("Failed to run killall terminal");
+        .expect("Failed to run Group13");
 
     std::process::exit(0);
 }
