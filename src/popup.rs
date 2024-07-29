@@ -66,6 +66,7 @@ pub fn run_popup(sender: Sender<Choice>,verbose:bool) {
     native_options.viewport.inner_size = Some(egui::vec2(300.0, 120.0));
     native_options.centered = true;
     native_options.viewport.drag_and_drop = Some(false);
+    native_options.viewport.window_level = Some(egui::WindowLevel::AlwaysOnTop);
 
     let exe_path = env::current_exe().expect("Failed to get current executable path");
     let assets_path = exe_path.parent().unwrap().join("assets");
