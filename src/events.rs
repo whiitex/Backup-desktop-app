@@ -80,14 +80,16 @@ pub fn manage_events() {
                                     match code {
                                         1 => {
                                             println!("Backup started");
-                                            match do_backup(){
-                                                Ok(_) => {
-                                                    println!("Backup done");
-                                                },
-                                                Err(e) => {
-                                                    println!("Backup failed: {:?}", e);
+                                            thread::spawn(move || {
+                                                match do_backup(){
+                                                    Ok(_) => {
+                                                        println!("Backup done");
+                                                    },
+                                                    Err(e) => {
+                                                        println!("Backup failed: {:?}", e);
+                                                    }
                                                 }
-                                            }
+                                            });
                                         },
                                         _ => {
                                             println!("Backup not started");
@@ -101,14 +103,16 @@ pub fn manage_events() {
                             play_sound();
 
                             println!("Backup started");
-                            match do_backup() {
-                                Ok(_) => {
-                                    println!("Backup done");
-                                },
-                                Err(e) => {
-                                    println!("Backup failed: {:?}", e);
+                            thread::spawn(move || {
+                                match do_backup() {
+                                    Ok(_) => {
+                                        println!("Backup done");
+                                    },
+                                    Err(e) => {
+                                        println!("Backup failed: {:?}", e);
+                                    }
                                 }
-                            }
+                            });
 
                             #[cfg(target_os = "windows")]
                             {
