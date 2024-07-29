@@ -64,7 +64,7 @@ pub fn manage_events() {
 
                             tracker.3=Some(child.id());
 
-                            play_sound();
+                            play_sound("backup_draw.mp3");
 
                             drop(tracker);
 
@@ -80,13 +80,17 @@ pub fn manage_events() {
                                     match code {
                                         1 => {
                                             println!("Backup started");
+                                            play_sound("backup_started.mp3");
+
                                             thread::spawn(move || {
                                                 match do_backup(){
                                                     Ok(_) => {
                                                         println!("Backup done");
+                                                        play_sound("backup_done.mp3");
                                                     },
                                                     Err(e) => {
                                                         println!("Backup failed: {:?}", e);
+                                                        play_sound("backup_failed.mp3");
                                                     }
                                                 }
                                             });
@@ -100,16 +104,18 @@ pub fn manage_events() {
                             });
                         },
                         TrackingResult::FinishedMinusShape => {
-                            play_sound();
-
                             println!("Backup started");
+                            play_sound("backup_started.mp3");
+
                             thread::spawn(move || {
-                                match do_backup() {
+                                match do_backup(){
                                     Ok(_) => {
                                         println!("Backup done");
+                                        play_sound("backup_done.mp3");
                                     },
                                     Err(e) => {
                                         println!("Backup failed: {:?}", e);
+                                        play_sound("backup_failed.mp3");
                                     }
                                 }
                             });
