@@ -30,7 +30,6 @@ fn main() {
     let wd = exe.parent().unwrap();
     let gui_path = wd.join("spawn_gui");
 
-    let mut gui= Command::new("echo").spawn().unwrap();
 
     #[cfg(target_os = "windows")]
     {
@@ -44,9 +43,26 @@ fn main() {
         if exists {
             println!("Spawn_gui already running!");
         } else {
-            gui = Command::new(gui_path)
+            let mut gui = Command::new(gui_path)
                 .spawn()
                 .expect("Failed to execute process");
+
+            let output = Command::new("tasklist")
+                .args(&["/FI", "IMAGENAME eq Group13.exe","/NH"])
+                .output()
+                .expect("Failed to execute command");
+
+            let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() -3;
+
+            // println!("{:?}", already_active_proc);
+            if already_active_proc > 0 {
+                println!("Process already running!");
+                return;
+            }
+
+            manage_events();
+
+            gui.wait().expect("Failed to wait on child process");
         }
     }
 
@@ -60,83 +76,68 @@ fn main() {
                 if !pid.unwrap().stdout.is_empty() {
                     println!("Spawn_gui already running!");
                 } else {
-                    gui = Command::new(gui_path)
+                    let mut gui = Command::new(gui_path)
                         .spawn()
                         .expect("Failed to execute process");
+
+                    #[cfg(target_os = "linux")]
+                    {
+                        let processes = Command::new("ps")
+                            .arg("-e")
+                            .stdout(Stdio::piped())
+                            .spawn()
+                            .expect("Failed to execute command 'ps'");
+                        let pid = Command::new("grep")
+                            .arg("Group13")
+                            .stdin(Stdio::from(processes.stdout.unwrap()))
+                            .stdout(Stdio::piped())
+                            .spawn()
+                            .expect("Failed to execute command 'grep'");
+
+                        let output = pid.wait_with_output().unwrap();
+                        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 2;
+
+                        println!("{:?}", already_active_proc);
+                        if already_active_proc > 0 {
+                            println!("Process already running!");
+                            return;
+                        }
+                    }
+
+                    #[cfg(target_os = "macos")]
+                    {
+                        let processes = Command::new("ps")
+                            .arg("-e")
+                            .stdout(Stdio::piped())
+                            .spawn()
+                            .expect("Failed to execute command 'ps'");
+                        let pid = Command::new("grep")
+                            .arg("Group13")
+                            .stdin(Stdio::from(processes.stdout.unwrap()))
+                            .stdout(Stdio::piped())
+                            .spawn()
+                            .expect("Failed to execute command 'grep'");
+
+                        let output = pid.wait_with_output().unwrap();
+                        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 4;
+
+                        println!("{:?}", already_active_proc);
+                        if already_active_proc > 0 {
+                            println!("Process already running!");
+                            return;
+                        }
+                    }
+
+                    manage_events();
+
+                    gui.wait().expect("Failed to wait on child process");
                 }
             }
             Err(_) => {}
         }
     }
 
-    /* Check if other Group13 processes exist*/
-    #[cfg(target_os = "windows")]
-    {
-        let output = Command::new("tasklist")
-            .args(&["/FI", "IMAGENAME eq Group13.exe","/NH"])
-            .output()
-            .expect("Failed to execute command");
-
-        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() -3;
-
-        // println!("{:?}", already_active_proc);
-        if already_active_proc > 0 {
-            println!("Process already running!");
-            return;
-        }
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-        let processes = Command::new("ps")
-            .arg("-e")
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to execute command 'ps'");
-        let pid = Command::new("grep")
-            .arg("Group13")
-            .stdin(Stdio::from(processes.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to execute command 'grep'");
-
-        let output = pid.wait_with_output().unwrap();
-        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 2;
-
-        println!("{:?}", already_active_proc);
-        if already_active_proc > 0 {
-            println!("Process already running!");
-            return;
-        }
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        let processes = Command::new("ps")
-            .arg("-e")
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to execute command 'ps'");
-        let pid = Command::new("grep")
-            .arg("Group13")
-            .stdin(Stdio::from(processes.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to execute command 'grep'");
-
-        let output = pid.wait_with_output().unwrap();
-        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() - 4;
-
-        println!("{:?}", already_active_proc);
-        if already_active_proc > 0 {
-            println!("Process already running!");
-            return;
-        }
-    }
-
     /* Events startup */
-    manage_events();
 
-    gui.wait().expect("Failed to wait on child process");
     println!("Main executed successfully!")
 }
