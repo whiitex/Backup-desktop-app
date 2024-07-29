@@ -1,4 +1,3 @@
-use std::path::Path;
 use std::process::Command;
 use rdev::{listen, Event, EventType, Key};
 use std::sync::{Arc, Mutex};

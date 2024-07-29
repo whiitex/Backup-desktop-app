@@ -1,9 +1,8 @@
 #![windows_subsystem = "windows"]
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use Group13::manage_events;
 use auto_launch::AutoLaunchBuilder;
 use std::env;
-use std::io::{Read, Stdout};
 
 fn main() {
     let exe = env::current_exe().unwrap(); // exe path
@@ -25,9 +24,54 @@ fn main() {
     println!("Autostart enabled: {}", auto.is_enabled().unwrap());
 
 
-    /* Check if other Group13 processes exist*/
+
+    /* App GUI startup (if not yet) */
+    let exe = env::current_exe().unwrap(); // exe path
+    let wd = exe.parent().unwrap();
     let gui_path = wd.join("spawn_gui");
 
+    let mut gui= Command::new("echo").spawn().unwrap();
+
+    #[cfg(target_os = "windows")]
+    {
+        let output = Command::new("tasklist")
+            .args(&["/FI", "IMAGENAME eq spawn_gui.exe", "/FO", "CSV", "/NH"])
+            .output()
+            .expect("Failed to execute command");
+
+        let exists = String::from_utf8_lossy(&output.stdout).split(",").count() > 1;
+
+        if exists {
+            println!("Spawn_gui already running!");
+        } else {
+            gui = Command::new(gui_path)
+                .spawn()
+                .expect("Failed to execute process");
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let pid = Command::new("pgrep")
+            .args(&["-f", &gui_path.to_str().unwrap()])
+            .output();
+
+        // println!("{:?}", pid);
+        match &pid {
+            Ok(_) => {
+                if !pid.unwrap().stdout.is_empty() {
+                    println!("Spawn_gui already running!");
+                } else {
+                    gui = Command::new(gui_path)
+                        .spawn()
+                        .expect("Failed to execute process");
+                }
+            }
+            Err(_) => {}
+        }
+    }
+
+    /* Check if other Group13 processes exist*/
     #[cfg(target_os = "windows")]
     {
         let output = Command::new("tasklist")
@@ -37,7 +81,7 @@ fn main() {
 
         let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() -3;
 
-        //println!("{:?}", already_active_proc);
+        // println!("{:?}", already_active_proc);
         if already_active_proc > 0 {
             println!("Process already running!");
             return;
@@ -67,15 +111,6 @@ fn main() {
             return;
         }
     }
-
-
-    /* App startup */
-    let gui_path = wd.join("spawn_gui");
-    // println!("{}", gui_path.to_str().unwrap());
-
-    let mut gui = Command::new(gui_path)
-        .spawn()
-        .expect("Failed to execute process");
 
 
     /* Events startup */
