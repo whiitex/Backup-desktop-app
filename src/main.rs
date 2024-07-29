@@ -24,6 +24,14 @@ fn main() {
     println!("Autostart enabled: {}", auto.is_enabled().unwrap());
 
 
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("osascript")
+            .arg("-e")
+            .arg("tell application \"Terminal\" to set visible of front window to false")
+            .output()
+            .expect("Failed to hide terminal");
+    }
 
     /* App GUI startup (if not yet) */
     let exe = env::current_exe().unwrap(); // exe path
@@ -131,6 +139,7 @@ fn main() {
                     manage_events();
 
                     gui.wait().expect("Failed to wait on child process");
+                        //let mut kill_command = Command::new("kill").arg("-9").arg(std::process::id().to_string()).output().expect("Terminal not closed");
                 }
             }
             Err(_) => {}
