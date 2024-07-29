@@ -29,6 +29,7 @@ fn main() {
             .output()
             .expect("Failed to execute command");
     }
+
     #[cfg(target_os = "macos")]
     {
         let _ = Command::new("pkill")
@@ -44,6 +45,7 @@ fn main() {
             .output()
             .expect("Failed to execute command");
     }
+
     #[cfg(target_os = "linux")]
     {
         let _ = Command::new("pkill")
