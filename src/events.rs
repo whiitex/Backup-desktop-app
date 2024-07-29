@@ -167,7 +167,7 @@ pub fn manage_events() {
                             .args(&["-f", &gui_path.to_str().unwrap()])
                             .output();
 
-                        println!("{:?}", pid);
+                        // println!("{:?}", pid);
                         match &pid {
                             Ok(_) => {
                                 if !pid.unwrap().stdout.is_empty() {
