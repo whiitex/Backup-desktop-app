@@ -1,3 +1,4 @@
+#![windows_subsystem = "windows"]
 use std::process::{Command, Stdio};
 use Group13::manage_events;
 use auto_launch::AutoLaunchBuilder;
@@ -30,10 +31,17 @@ fn main() {
     #[cfg(target_os = "windows")]
     {
         let output = Command::new("tasklist")
-            .args(&["/FI", "IMAGENAME eq Group13.exe", "/FO", "CSV", "/NH"])
+            .args(&["/FI", "IMAGENAME eq Group13.exe","/NH"])
             .output()
             .expect("Failed to execute command");
 
+        let already_active_proc = std::str::from_utf8(&output.stdout).unwrap().split("\n").count() -3;
+
+        //println!("{:?}", already_active_proc);
+        if already_active_proc > 0 {
+            println!("Process already running!");
+            return;
+        }
     }
 
     #[cfg(not(target_os = "windows"))]

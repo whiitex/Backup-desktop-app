@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use std::thread;
 use Group13::{Choice, run_popup};
 fn main() {

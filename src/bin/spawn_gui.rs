@@ -1,4 +1,4 @@
-
+#![windows_subsystem = "windows"]
 use Group13::{run_backup_app};
 
 fn main() {
