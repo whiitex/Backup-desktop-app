@@ -6,6 +6,7 @@ use crate::mouse_tracker::{MouseTracker, Point};
 use crate::{TrackingResult};
 use std::{env, thread};
 use crate::fs_copy::do_backup;
+use crate::sound::play_sound;
 
 pub fn manage_events() {
     let size = match rdev::display_size() {
@@ -64,7 +65,7 @@ pub fn manage_events() {
 
                             tracker.3=Some(child.id());
 
-                            println!("\x07");
+                            play_sound();
 
                             drop(tracker);
 
@@ -98,7 +99,7 @@ pub fn manage_events() {
                             });
                         },
                         TrackingResult::FinishedMinusShape => {
-                            println!("\x07");
+                            play_sound();
 
                             println!("Backup started");
                             match do_backup() {
