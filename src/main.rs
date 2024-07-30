@@ -14,30 +14,15 @@ fn main() {
     let app_path = wd.join("Group13");
     // println!("{}", app_path.to_str().unwrap());
 
-    #[cfg(not(target_os = "macos"))]
-    {
+
         let auto = AutoLaunchBuilder::new()
             .set_app_name("Group13")
             .set_app_path(&app_path.to_str().unwrap())
-            .set_use_launch_agent(true)
+            .set_use_launch_agent(false)
             .build()
             .unwrap();
         auto.enable().unwrap();
         println!("Autostart enabled: {}", auto.is_enabled().unwrap());
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        let app_name = "Group13";
-        let args = &["--minimized"];
-        let auto = AutoLaunch::new(app_name, &app_path.to_str().unwrap(), false, args);
-
-        // enable the auto launch
-        auto.enable().is_ok();
-        auto.is_enabled().unwrap();
-    }
-
-
 
     #[cfg(target_os = "macos")]
     {

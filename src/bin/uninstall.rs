@@ -1,6 +1,6 @@
 use std::env;
 use std::process::Command;
-use auto_launch::AutoLaunchBuilder;
+use auto_launch::{AutoLaunch, AutoLaunchBuilder};
 
 fn main() {
     let exe = env::current_exe().unwrap(); // exe path
@@ -10,7 +10,7 @@ fn main() {
     let _ = AutoLaunchBuilder::new()
         .set_app_name("Group13")
         .set_app_path(&app_path.to_str().unwrap())
-        .set_use_launch_agent(true)
+        .set_use_launch_agent(false)
         .build()
         .unwrap().disable();
 
@@ -44,6 +44,13 @@ fn main() {
             .args(&["-f", "spawn_popup"])
             .output()
             .expect("Failed to execute command");
+
+        let app_name = "Group13";
+        let args = &["--minimized"];
+        let auto = AutoLaunch::new(app_name, &app_path.to_str().unwrap(), false, args);
+
+        // enable the auto launch
+        auto.disable().is_ok();
     }
 
     #[cfg(target_os = "linux")]
