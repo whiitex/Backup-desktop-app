@@ -41,7 +41,7 @@ pub fn manage_events() {
                     let res = tracker.0.track_point(point);
                     tracker.1 = point.x;
                     tracker.2 = point.y;
-                    println!("{:?}, {:?}", res, point);
+                    //println!("{:?}, {:?}", res, point);
                     //println!("{:?}", tracker.0);
                     let pid = tracker.3;
                     match res {
@@ -78,7 +78,7 @@ pub fn manage_events() {
                                 tracker.0.re_init();
                                 let conversion = String::from_utf8_lossy(&stdout).parse();
                                 if let Ok(code) = conversion{
-                                    println!("{}", code);
+                                    //println!("{}", code);
                                     match code {
                                         1 => {
                                             println!("Backup started");
@@ -161,7 +161,7 @@ pub fn manage_events() {
                     *state = 1;
                 }
                 else if key == Key::KeyT && *state == 1 {
-                    println!("Ctrl+T pressed");
+                    //println!("Ctrl+T pressed");
                     let exe = env::current_exe().unwrap(); // exe path
                     let wd = exe.parent().unwrap();
                     let gui_path = wd.join("spawn_gui");
