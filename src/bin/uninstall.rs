@@ -44,13 +44,6 @@ fn main() {
             .args(&["-f", "spawn_popup"])
             .output()
             .expect("Failed to execute command");
-
-        let app_name = "Group13";
-        let args = &["--minimized"];
-        let auto = AutoLaunch::new(app_name, &app_path.to_str().unwrap(), false, args);
-
-        // enable the auto launch
-        auto.disable().is_ok();
     }
 
     #[cfg(target_os = "linux")]
