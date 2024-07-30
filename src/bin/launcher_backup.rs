@@ -1,14 +1,13 @@
 #![windows_subsystem = "windows"]
-use std::{env, thread};
+use std::{env};
 use std::process::{Command, Stdio};
-use std::time::Duration;
 
 fn main() {
 
     let exe = env::current_exe().unwrap(); // exe path
     let wd = exe.parent().unwrap();
     let app_path = wd.join("Group13");
-    let out = Command::new(app_path)
+    let _ = Command::new(app_path)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())

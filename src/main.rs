@@ -1,5 +1,5 @@
 #![windows_subsystem = "windows"]
-use std::process::{Child, Command, Stdio};
+use std::process::{ Command};
 use Group13::manage_events;
 use auto_launch::AutoLaunchBuilder;
 use std::env;

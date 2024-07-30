@@ -1,5 +1,12 @@
 @echo off
 
+if exist "release\windows\assets\config.json" (
+    del "release\windows\assets\config.json"
+    echo File deleted: assets\config.json
+) else (
+    echo File not found: release\windows\assets\config.json
+)
+
 REM Build the project with cargo in release mode for the entire workspace
 cargo build --release --workspace
 

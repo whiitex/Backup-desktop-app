@@ -1,6 +1,6 @@
 use std::process::Command;
 use rdev::{listen, Event, EventType, Key};
-use std::sync::{Arc, Condvar, Mutex};
+use std::sync::{Arc, Mutex};
 use crate::mouse_tracker::{MouseTracker, Point};
 use crate::{TrackingResult};
 use std::{env, thread};
