@@ -14,6 +14,16 @@ fn main() {
         .build()
         .unwrap().disable();
 
+    #[cfg(target_os = "macos")]
+    {
+        let _ = AutoLaunchBuilder::new()
+            .set_app_name("Group13")
+            .set_app_path(&app_path.to_str().unwrap())
+            .set_use_launch_agent(true)
+            .build()
+            .unwrap().disable();
+    }
+
     #[cfg(target_os = "windows")]
     {
         let _ = Command::new("taskkill")
